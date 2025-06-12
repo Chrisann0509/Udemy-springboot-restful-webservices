@@ -20,8 +20,8 @@ public class UserController {
 
     //build create User REST API
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User savedUsed = userService.createUser(user);
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO user) {
+        UserDTO savedUsed = userService.createUser(user);
         return new ResponseEntity<>(savedUsed, HttpStatus.CREATED);
     }
 
