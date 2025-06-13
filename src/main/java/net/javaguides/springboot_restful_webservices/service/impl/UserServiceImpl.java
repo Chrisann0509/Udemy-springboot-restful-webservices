@@ -2,6 +2,7 @@ package net.javaguides.springboot_restful_webservices.service.impl;
 
 import net.javaguides.springboot_restful_webservices.dto.UserDTO;
 import net.javaguides.springboot_restful_webservices.entity.User;
+import net.javaguides.springboot_restful_webservices.exception.ResourceNotFoundException;
 import net.javaguides.springboot_restful_webservices.mapper.AutoUserMapper;
 import net.javaguides.springboot_restful_webservices.mapper.UserMapper;
 import net.javaguides.springboot_restful_webservices.repository.UserRepository;
@@ -41,8 +42,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserById(Long userId) {
-        Optional<User> optionalUser = userRepository.findById(userId);
-        User user = optionalUser.get();
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", userId)
+        );
         // return UserMapper.mapToUserDTO(user);
         //return modelMapper.map(user, UserDTO.class);
         return AutoUserMapper.MAPPER.mapTOUserDTO(user);
@@ -58,7 +60,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO updateUser(UserDTO user) {
-        User existingUser = userRepository.findById(user.getId()).get();
+        User existingUser = userRepository.findById(user.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", user.getId())
+        );
         existingUser.setFirstName(user.getFirstName());
         existingUser.setLastName(user.getLastName());
         existingUser.setEmail(user.getEmail());
@@ -70,6 +74,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long userId) {
+        userRepository.findById(userId).orElseThrow(
+                () -> new ResourceNotFoundException("User", "id", userId)
+        );
+
         userRepository.deleteById(userId);
     }
 }
