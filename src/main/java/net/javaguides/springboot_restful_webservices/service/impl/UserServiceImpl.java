@@ -2,6 +2,7 @@ package net.javaguides.springboot_restful_webservices.service.impl;
 
 import net.javaguides.springboot_restful_webservices.dto.UserDTO;
 import net.javaguides.springboot_restful_webservices.entity.User;
+import net.javaguides.springboot_restful_webservices.mapper.AutoUserMapper;
 import net.javaguides.springboot_restful_webservices.mapper.UserMapper;
 import net.javaguides.springboot_restful_webservices.repository.UserRepository;
 import net.javaguides.springboot_restful_webservices.service.UserService;
@@ -15,24 +16,26 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-    UserServiceImpl(UserRepository userRepository) {
+    UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
         this.userRepository = userRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
     public UserDTO createUser(UserDTO userDTO) {
         // Convert UserDTO into User JPA Entity
         // User user = UserMapper.mapToUser(userDTO);
+        // User user = modelMapper.map(userDTO, User.class);
 
-        User user = modelMapper.map(userDTO, User.class);
+        User user = AutoUserMapper.MAPPER.mapToUser(userDTO);
         User savedUser = userRepository.save(user);
 
-        //Convert User JPA entity to UserDTO
-        //UserDTO savedUserDTO = UserMapper.mapToUserDTO(savedUser);
-
-        UserDTO savedUserDTO = modelMapper.map(savedUser, UserDTO.class);
+        // Convert User JPA entity to UserDTO
+        // UserDTO savedUserDTO = UserMapper.mapToUserDTO(savedUser);
+        // UserDTO savedUserDTO = modelMapper.map(savedUser, UserDTO.class);
+        UserDTO savedUserDTO = AutoUserMapper.MAPPER.mapTOUserDTO(savedUser);
         return savedUserDTO;
     }
 
@@ -40,15 +43,17 @@ public class UserServiceImpl implements UserService {
     public UserDTO getUserById(Long userId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         User user = optionalUser.get();
-        //return UserMapper.mapToUserDTO(user);
-        return modelMapper.map(user, UserDTO.class);
+        // return UserMapper.mapToUserDTO(user);
+        //return modelMapper.map(user, UserDTO.class);
+        return AutoUserMapper.MAPPER.mapTOUserDTO(user);
     }
 
     @Override
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         // return users.stream().map(UserMapper::mapToUserDTO).collect(Collectors.toList());
-        return users.stream().map(user -> modelMapper.map(user, UserDTO.class)).collect(Collectors.toList());
+        // return users.stream().map(user -> modelMapper.map(user, UserDTO.class)).collect(Collectors.toList());
+        return users.stream().map(AutoUserMapper.MAPPER::mapTOUserDTO).collect(Collectors.toList());
     }
 
     @Override
@@ -59,7 +64,8 @@ public class UserServiceImpl implements UserService {
         existingUser.setEmail(user.getEmail());
         User updatedUser = userRepository.save(existingUser);
         // return UserMapper.mapToUserDTO(updatedUser);
-        return modelMapper.map(updatedUser, UserDTO.class);
+        // return modelMapper.map(updatedUser, UserDTO.class);
+        return AutoUserMapper.MAPPER.mapTOUserDTO(updatedUser);
     }
 
     @Override
