@@ -1,5 +1,6 @@
 package net.javaguides.springboot_restful_webservices.controller;
 
+import jakarta.validation.Valid;
 import net.javaguides.springboot_restful_webservices.dto.UserDTO;
 import net.javaguides.springboot_restful_webservices.entity.User;
 import net.javaguides.springboot_restful_webservices.exception.ErrorDetails;
@@ -24,7 +25,7 @@ public class UserController {
 
     //build create User REST API
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO user) {
+    public ResponseEntity<UserDTO> createUser(@Valid @RequestBody UserDTO user) {
         UserDTO savedUsed = userService.createUser(user);
         return new ResponseEntity<>(savedUsed, HttpStatus.CREATED);
     }
@@ -47,7 +48,7 @@ public class UserController {
     // build update user REST API
     @PutMapping("{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable("id") Long userId,
-                                           @RequestBody UserDTO user) {
+                                           @RequestBody @Valid UserDTO user) {
         user.setId(userId);
         UserDTO updatedUser = userService.updateUser(user);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
