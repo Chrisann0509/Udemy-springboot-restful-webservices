@@ -10,5 +10,16 @@ services:
     networks:
       springboot-mysql-net:
 
+  springboot-restful-webservices:
+    container_name: springboot-restful-webservices
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      springboot-mysql-net:
+    restart: on-failure
+
 networks:
   springboot-mysql-net:
