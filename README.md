@@ -161,3 +161,121 @@ springboot-restful-webservices
 - **--name springboot-mysql-container** → Names the Spring Boot container
 - **-p 8080:8080** → Maps container port 8080 to host port 8080
 - **springboot-restful-webservices** → Docker image to run
+
+
+# Dockerizing Spring Boot MySQL Application Using Docker Compose
+
+### Step 1: Create Docker Compose File
+
+Create a YAML file in the **project root directory**.
+
+**File name:**
+
+`docker-compose.yml`
+
+**Content:**
+
+```yaml
+version: "3.8"
+
+services:
+  mysqldb:
+    container_name: mysqldb
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: employeedb
+    networks:
+      springboot-mysql-net:
+
+networks:
+  springboot-mysql-net:
+```
+
+### Step 2: Run Docker Compose File
+
+Run the following command in the project root directory (where the `docker-compose.yml` file is located):
+
+```bash
+docker-compose up
+```
+
+- This starts the MySQL container and creates the defined network automatically.
+
+### Docker Compose Commands
+
+**docker-compose up -d**
+
+```bash
+docker-compose up -d
+```
+
+- Starts all services defined in `docker-compose.yml`
+- **d (detached mode)** runs containers in the background
+- Frees up the terminal while containers keep running
+
+**docker-compose down**
+
+```bash
+docker-compose down
+```
+
+- Stops all running containers created by Docker Compose
+- Removes containers and the default network
+- Does **not** remove images or volumes (unless specified)
+
+---
+
+### **Quick Interview Summary**
+
+- `docker-compose up -d` → Start services in background
+- `docker-compose down` → Stop and clean up services
+
+### Step 3: Run Spring Boot Using Docker Compose
+
+1. **Update `docker-compose.yml`**
+
+```yaml
+version: "3.8"
+
+services:
+  mysqldb:
+    container_name: mysqldb
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: employeedb
+    networks:
+      springboot-mysql-net:
+
+  springboot-restful-webservices:
+    container_name: springboot-restful-webservices
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    networks:
+      springboot-mysql-net:
+    restart: on-failure
+
+networks:
+  springboot-mysql-net:
+```
+
+✅ Notes:
+
+- Both **MySQL** and **Spring Boot** containers are in the same Docker network.
+- Spring Boot can connect to MySQL using the hostname `mysqldb`.
+- The `version` field is removed (it’s obsolete in newer Docker Compose).
+1. **Run Docker Compose with Build**
+
+```bash
+docker-compose up -d --build
+```
+
+**Explanation:**
+
+- **docker-compose up** → Starts all services
+- **-build** → Rebuilds images before starting containers
+- **d** → Runs containers in detached (background) mode
